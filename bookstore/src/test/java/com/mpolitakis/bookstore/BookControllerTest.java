@@ -1,6 +1,5 @@
 package com.mpolitakis.bookstore;
 
-import com.auth0.jwt.exceptions.JWTCreationException;
 import com.mpolitakis.bookstore.configuration.JwtConfiguration;
 import com.mpolitakis.bookstore.controllers.BookController;
 import com.mpolitakis.bookstore.exceptions.BookException;
@@ -8,7 +7,6 @@ import com.mpolitakis.bookstore.models.Book;
 import com.mpolitakis.bookstore.repositories.UserRepository;
 import com.mpolitakis.bookstore.services.BookService;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,12 +14,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.validation.Errors;
-
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
