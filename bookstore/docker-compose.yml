@@ -1,0 +1,30 @@
+services:
+  
+  bookstore:
+    container_name: bookstore
+    image: michpoli/bookstore
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_URL=jdbc:postgresql://bookstoreplsql:5432/postgres
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=12345
+    depends_on:
+      - bookstoreplsql
+
+  
+  bookstoreplsql:
+    container_name: bookstoreplsql
+    image: postgres:12
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata: {}
