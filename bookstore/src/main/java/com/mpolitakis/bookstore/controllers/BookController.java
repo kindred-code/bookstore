@@ -43,10 +43,7 @@ public class BookController {
 	private final BookService bookService;
     private final UserRepository userRepository;
 
-    JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authenticationToken.getCredentials();
-        String username = (String) jwt.getClaims().get("Username");
-
+   
 
 
 
@@ -61,16 +58,28 @@ public class BookController {
 
     @PreAuthorize("hasAuthority('USER')")
 	@PostMapping("")
-	public ResponseEntity<Book> addBook(@Validated @RequestBody Book book, Errors errors) throws BookException {
+	public ResponseEntity<Book> addBook(@Validated @RequestBody Book book) throws BookException {
 
+		if(book != null){
 
-		boolean bookExists = bookService.findBookByTitle(book.getTitle()) != null;
-		if (bookExists) {
-			logger.error("Unable to create. A book with title {} already exist", book.getTitle());
-			throw new BookException("Unable to create. A book with title " + book.getTitle() + " already exist.",
+		
+		Optional<Book> bookByTitle = bookService.findBookByTitle(book.getTitle());
+		if (!bookByTitle.isPresent() ) {
+			logger.error("Missing book info");
+			throw new BookException("Missing book info",
 					HttpStatus.CONFLICT);
 
 		}
+		
+	}
+	else{
+		throw new BookException("Book is null", HttpStatus.CONFLICT);
+	}
+
+		 JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authenticationToken.getCredentials();
+        String username = (String) jwt.getClaims().get("Username");
+
         
 
         book.setUser(userRepository.findByUsername(username));
@@ -85,7 +94,7 @@ public class BookController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Optional<Book>> findBookById(@PathVariable Long id) throws BookException {
 		Optional<Book> book = bookService.findBookById(id);
-		if (book == null) {
+		if (!book.isPresent()) {
 			logger.error("Book with id {} not found.", id);
 			throw new BookException("Book with id " + id + " not found", HttpStatus.NOT_FOUND);
 		}
@@ -94,14 +103,12 @@ public class BookController {
 
     @PreAuthorize("hasAuthority('USER')")
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateBook(@PathVariable Long id, @Validated @RequestBody Book book, Errors errors)
+	public ResponseEntity<?> updateBook(@PathVariable Long id, @Validated @RequestBody Book book)
 			throws BookException {
-		if (errors.hasErrors()) {
-			throw new BookException(errors.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
-		}
+		
 		
 		Optional<Book> currentBook = bookService.findBookById(id);
-		if (currentBook == null) {
+		if (!currentBook.isPresent()) {
 			logger.error("Unable to update. Book with id {} not found.", id);
 			throw new BookException("Unable to update. Book with id " + id + " not found", HttpStatus.NOT_FOUND);
 		}
@@ -113,11 +120,11 @@ public class BookController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteBook(@PathVariable Long id) throws BookException {
 		Optional<Book> currentBook = bookService.findBookById(id);
-		if (currentBook == null) {
+		if (!currentBook.isPresent()) {
 			logger.error("Unable to delete. Book with id {} not found.", id);
 			throw new BookException("Unable to delete. Book with id " + id + " not found", HttpStatus.NOT_FOUND);
 		}
 		bookService.deleteBook(id);
-		return new ResponseEntity<Book>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<Book>(HttpStatus.ACCEPTED);
 	}
 }

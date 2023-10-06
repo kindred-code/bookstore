@@ -16,12 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import java.util.Date;
 
-@SpringBootTest
+@SpringBootTest(classes = BookServiceTest.class)
 public class BookServiceTest {
 
     @Mock
@@ -36,7 +34,7 @@ public class BookServiceTest {
 
     @BeforeEach
     void setUp() {
-        mockUser = new User(/* Initialize with necessary user data */);
+        mockUser = new User(1L,"testUser","polit.michalis@gmail.com", "12345");
 
         mockBooks = new ArrayList<>();
         mockBooks.add(new Book(1L, "Title 1", "Author 1", "ISBN 1", new Date(), mockUser));

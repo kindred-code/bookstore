@@ -15,6 +15,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,12 +35,13 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 @Slf4j
 @Component
 @Configuration
+@RequiredArgsConstructor
 public class JwtConfiguration {
 
 
   
-  @Value("${spring.application.security.jwt.keystore-location}")
-	private String keyStorePath;
+  	@Value("${spring.application.security.jwt.keystore-location}")
+	public String keyStorePath;
 	
 	@Value("${spring.application.security.jwt.keystore-password}")
 	private String keyStorePassword;
@@ -112,7 +115,7 @@ public class JwtConfiguration {
 	}
     
 
-	public String createJwtForClaims(String subject) throws IllegalArgumentException, JWTCreationException, IOException {
+	public String createJwt(String subject) throws IllegalArgumentException, JWTCreationException, IOException {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(Instant.now().toEpochMilli());
 		calendar.add(Calendar.DATE, 1);

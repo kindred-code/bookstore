@@ -58,7 +58,7 @@ public class AuthenticationService {
     if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 
     
-        String jwt = jwtConfig.createJwtForClaims(request.getUsername());
+        String jwt = jwtConfig.createJwt(request.getUsername());
         return new AuthenticationResponse(jwt);
     }
 

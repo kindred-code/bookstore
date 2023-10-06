@@ -10,6 +10,7 @@ import com.mpolitakis.bookstore.models.User;
 import com.mpolitakis.bookstore.repositories.UserRepository;
 import com.mpolitakis.bookstore.services.AuthenticationService;
 
+import org.apache.catalina.core.ApplicationContext;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 
 
-@SpringBootTest
+@SpringBootTest(classes = AuthenticationServiceTest.class)
 public class AuthenticationServiceTest {
 
     @Mock
@@ -46,6 +47,7 @@ public class AuthenticationServiceTest {
 
     @InjectMocks
     private AuthenticationService authenticationService;
+
 
     @Test
     void testRegister() {
@@ -81,7 +83,7 @@ public class AuthenticationServiceTest {
 
         when(repository.findByUsername("testUser")).thenReturn(user);
         when(passwordEncoder.matches("testPassword", "encodedPassword")).thenReturn(true);
-        when(jwtConfig.createJwtForClaims("testUser")).thenReturn("testJwtToken");
+        when(jwtConfig.createJwt("testUser")).thenReturn("testJwtToken");
 
         
         AuthenticationResponse result = authenticationService.authenticate(request);

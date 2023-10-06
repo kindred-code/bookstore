@@ -31,7 +31,7 @@ public class BookService {
 		return bookRepository.findById(id);
 	}
 
-     public Book findBookByTitle(String title) {
+     public Optional<Book> findBookByTitle(String title) {
 		return bookRepository.findByTitle(title);
 	}
 	
