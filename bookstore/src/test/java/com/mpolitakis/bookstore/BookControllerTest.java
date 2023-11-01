@@ -22,8 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-
-@SpringBootTest(classes = {BookControllerTest.class, JwtConfiguration.class })
+@SpringBootTest(classes = { BookControllerTest.class, JwtConfiguration.class })
 class BookControllerTest {
 
     @Mock
@@ -38,22 +37,17 @@ class BookControllerTest {
     @InjectMocks
     private BookController bookController;
 
-  
     @Test
     void testGetAllBooks() {
-       
+
         List<Book> mockBooks = Arrays.asList(new Book(), new Book());
         when(bookService.getAllBooks()).thenReturn(mockBooks);
 
-       
         ResponseEntity<List<Book>> responseEntity = bookController.getAllBooks();
 
-       
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(mockBooks, responseEntity.getBody());
     }
-
-   
 
     @Test
     void testAddBook_BookExists() {
@@ -67,40 +61,35 @@ class BookControllerTest {
 
     @Test
     void testFindBookById() throws BookException {
-        
+
         Long bookId = 1L;
         Book mockBook = createMockBook();
         when(bookService.findBookById(bookId)).thenReturn(Optional.of(mockBook));
 
-        
         ResponseEntity<Optional<Book>> responseEntity = bookController.findBookById(bookId);
 
-        
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(Optional.of(mockBook), responseEntity.getBody());
     }
 
     @Test
     void testFindBookById_BookNotFound() {
-        
+
         Long bookId = 1L;
         when(bookService.findBookById(bookId)).thenReturn(Optional.empty());
 
-        
         assertThrows(BookException.class, () -> bookController.findBookById(bookId));
     }
 
     @Test
     void testUpdateBook() throws BookException {
-       
+
         Long bookId = 1L;
         Book mockBook = createMockBook();
         when(bookService.findBookById(bookId)).thenReturn(Optional.of(mockBook));
 
-        
         ResponseEntity<String> responseEntity = (ResponseEntity<String>) bookController.updateBook(bookId, mockBook);
 
-        
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("The book has been updated", responseEntity.getBody());
         verify(bookService).updateBook(eq(bookId), any(Book.class));
@@ -115,8 +104,6 @@ class BookControllerTest {
         // When and Then
         assertThrows(BookException.class, () -> bookController.updateBook(bookId, createMockBook()));
     }
-
-    
 
     @Test
     void testDeleteBook() throws BookException {

@@ -26,7 +26,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
-
 @SpringBootTest(classes = AuthenticationServiceTest.class)
 public class AuthenticationServiceTest {
 
@@ -48,10 +47,9 @@ public class AuthenticationServiceTest {
     @InjectMocks
     private AuthenticationService authenticationService;
 
-
     @Test
     void testRegister() {
-        
+
         RegisterRequest request = new RegisterRequest();
         request.setUsername("testUser");
         request.setEmail("test@example.com");
@@ -59,14 +57,12 @@ public class AuthenticationServiceTest {
 
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
 
-       
         RegisterRequest result = authenticationService.register(request);
 
-        
         assertNotNull(result);
         assertEquals("testUser", result.getUsername());
         assertEquals("test@example.com", result.getEmail());
-        
+
     }
 
     @Test
@@ -85,25 +81,22 @@ public class AuthenticationServiceTest {
         when(passwordEncoder.matches("testPassword", "encodedPassword")).thenReturn(true);
         when(jwtConfig.createJwt("testUser")).thenReturn("testJwtToken");
 
-        
         AuthenticationResponse result = authenticationService.authenticate(request);
 
-        
         assertNotNull(result);
         assertEquals("testJwtToken", result.getAccessToken());
-        
+
     }
 
     @Test
     void testAuthenticate_UserNotFound() {
-        
+
         AuthenticationRequest request = new AuthenticationRequest();
         request.setUsername("nonexistentUser");
         request.setPassword("testPassword");
 
         when(repository.findByUsername("nonexistentUser")).thenThrow(new UsernameNotFoundException("User not found"));
 
-       
         assertThrows(ResponseStatusException.class, () -> authenticationService.authenticate(request));
     }
 
@@ -123,5 +116,5 @@ public class AuthenticationServiceTest {
 
         assertThrows(ResponseStatusException.class, () -> authenticationService.authenticate(request));
     }
-   
+
 }

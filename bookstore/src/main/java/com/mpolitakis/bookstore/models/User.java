@@ -1,6 +1,5 @@
 package com.mpolitakis.bookstore.models;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +20,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,13 +27,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-   
 
     @Column(nullable = false, length = 128, unique = true)
     private String username;
-     
+
     @Column(nullable = false, length = 128)
     private String password;
     @Email
@@ -45,17 +43,15 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> listAuthorities = new ArrayList<GrantedAuthority>();
-      
-    
-      listAuthorities.add(new SimpleGrantedAuthority("USER"));
-    
-        
+
+        listAuthorities.add(new SimpleGrantedAuthority("USER"));
+
         return listAuthorities;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-      return true;
+        return true;
     }
 
     @Override
@@ -73,7 +69,4 @@ public class User implements UserDetails {
         return true;
     }
 
-
-
 }
-

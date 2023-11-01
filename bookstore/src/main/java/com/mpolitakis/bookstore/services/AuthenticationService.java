@@ -23,53 +23,47 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-  private final UserRepository repository;
-  private final PasswordEncoder passwordEncoder;
-  private final JwtConfiguration jwtConfig;
-  private final AuthenticationManager authenticationManager;
+    private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtConfiguration jwtConfig;
+    private final AuthenticationManager authenticationManager;
 
-  public RegisterRequest register(RegisterRequest request) {
-    var user = User.builder()
-        .username(request.getUsername())
-        .email(request.getEmail())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .build();
-    repository.save(user);
+    public RegisterRequest register(RegisterRequest request) {
+        var user = User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
+        repository.save(user);
 
-    
-    return request;
-  }
-
-  public AuthenticationResponse authenticate(AuthenticationRequest request) throws IllegalArgumentException, JWTCreationException, IOException {
-    
-    authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            request.getUsername(),
-            request.getPassword()
-        )
-    );
-    User user;
-    try {
-        user = repository.findByUsername(request.getUsername());
-    } catch (UsernameNotFoundException e) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+        return request;
     }
 
-    if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+    public AuthenticationResponse authenticate(AuthenticationRequest request)
+            throws IllegalArgumentException, JWTCreationException, IOException {
 
-    
-        String jwt = jwtConfig.createJwt(request.getUsername());
-        return new AuthenticationResponse(jwt);
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()));
+        User user;
+        try {
+            user = repository.findByUsername(request.getUsername());
+        } catch (UsernameNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+        }
+
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+
+            String jwt = jwtConfig.createJwt(request.getUsername());
+            return new AuthenticationResponse(jwt);
+        }
+
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
     }
 
-    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
-}
-
-public User getUserByUsername(String username){
-    return repository.findByUsername(username);
-}
-  
-
-
+    public User getUserByUsername(String username) {
+        return repository.findByUsername(username);
+    }
 
 }

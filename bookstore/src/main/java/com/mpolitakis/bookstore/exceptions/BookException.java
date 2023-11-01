@@ -10,7 +10,7 @@ public class BookException extends Exception {
 	private String errorMessage;
 
 	public BookException() {
-	
+
 	}
 
 	public BookException(String errorMessage, HttpStatus errorStatus) {

@@ -38,34 +38,30 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 @RequiredArgsConstructor
 public class JwtConfiguration {
 
-
-  
-  	@Value("${spring.application.security.jwt.keystore-location}")
+	@Value("${spring.application.security.jwt.keystore-location}")
 	public String keyStorePath;
-	
+
 	@Value("${spring.application.security.jwt.keystore-password}")
 	private String keyStorePassword;
-	
+
 	@Value("${spring.application.security.jwt.key-alias}")
 	private String keyAlias;
-	
 
-
-
-@Bean
+	@Bean
 	public KeyStore keyStore() throws java.io.IOException {
 		try {
 			KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-			InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(keyStorePath);
+			InputStream resourceAsStream = Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream(keyStorePath);
 			keyStore.load(resourceAsStream, keyStorePassword.toCharArray());
 			return keyStore;
 		} catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
 			log.error("Unable to load keystore: {}", keyStorePath, e);
 		}
-		
+
 		throw new IllegalArgumentException("Unable to load keystore");
 	}
-	
+
 	@Bean
 	public RSAPrivateKey jwtSigningKey(KeyStore keyStore) {
 		try {
@@ -76,26 +72,26 @@ public class JwtConfiguration {
 		} catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e) {
 			log.error("Unable to load private key from keystore: {}", keyStorePath, e);
 		}
-		
+
 		throw new IllegalArgumentException("Unable to load private key");
 	}
-	
+
 	@Bean
 	public RSAPublicKey jwtValidationKey(KeyStore keyStore) {
 		try {
 			Certificate certificate = keyStore.getCertificate(keyAlias);
 			PublicKey publicKey = certificate.getPublicKey();
-			
+
 			if (publicKey instanceof RSAPublicKey) {
 				return (RSAPublicKey) publicKey;
 			}
 		} catch (KeyStoreException e) {
 			log.error("Unable to load private key from keystore: {}", keyStorePath, e);
 		}
-		
+
 		throw new IllegalArgumentException("Unable to load RSA public key");
 	}
-	
+
 	@Bean
 	public JwtDecoder jwtDecoder(RSAPublicKey rsaPublicKey) {
 		return NimbusJwtDecoder.withPublicKey(rsaPublicKey).build();
@@ -103,34 +99,30 @@ public class JwtConfiguration {
 
 	@Bean
 	public JwtAuthenticationConverter jwtAuthenticationConverter() {
-			final JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-			
-			grantedAuthoritiesConverter.setAuthoritiesClaimName("Authorities");
-			
-			grantedAuthoritiesConverter.setAuthorityPrefix("");
+		final JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
-			final JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-			jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-			return jwtAuthenticationConverter;
+		grantedAuthoritiesConverter.setAuthoritiesClaimName("Authorities");
+
+		grantedAuthoritiesConverter.setAuthorityPrefix("");
+
+		final JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+		return jwtAuthenticationConverter;
 	}
-    
 
 	public String createJwt(String subject) throws IllegalArgumentException, JWTCreationException, IOException {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(Instant.now().toEpochMilli());
 		calendar.add(Calendar.DATE, 1);
-		
+
 		JWTCreator.Builder jwtBuilder = JWT.create().withSubject(subject);
 		String authority = "USER";
-		
-		
-		
-		
+
 		return jwtBuilder
 				.withNotBefore(new Date())
 				.withExpiresAt(calendar.getTime())
 				.withClaim("Authorities", authority)
-                .withClaim("Username", subject)
+				.withClaim("Username", subject)
 				.sign(Algorithm.RSA256(jwtValidationKey(keyStore()), jwtSigningKey(keyStore())));
 	}
 }

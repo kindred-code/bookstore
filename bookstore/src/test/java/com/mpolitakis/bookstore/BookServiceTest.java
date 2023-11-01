@@ -1,6 +1,5 @@
 package com.mpolitakis.bookstore;
 
-
 import com.mpolitakis.bookstore.models.Book;
 import com.mpolitakis.bookstore.models.User;
 import com.mpolitakis.bookstore.repositories.BookRepository;
@@ -34,14 +33,12 @@ public class BookServiceTest {
 
     @BeforeEach
     void setUp() {
-        mockUser = new User(1L,"testUser","polit.michalis@gmail.com", "12345");
+        mockUser = new User(1L, "testUser", "polit.michalis@gmail.com", "12345");
 
         mockBooks = new ArrayList<>();
         mockBooks.add(new Book(1L, "Title 1", "Author 1", "ISBN 1", new Date(), mockUser));
         mockBooks.add(new Book(2L, "Title 2", "Author 2", "ISBN 2", new Date(), mockUser));
     }
-
-    
 
     @Test
     void testAddBook() {
@@ -64,6 +61,4 @@ public class BookServiceTest {
         verify(bookRepository, times(1)).save(updatedBook);
     }
 
-   
 }
-

@@ -17,7 +17,6 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-
 @SpringBootTest(classes = AuthenticationControllerTest.class)
 public class AuthenticationControllerTest {
 
@@ -29,7 +28,7 @@ public class AuthenticationControllerTest {
 
     @Test
     void testRegister() {
-        
+
         RegisterRequest request = new RegisterRequest();
         request.setUsername("testUser");
         request.setEmail("test@example.com");
@@ -37,16 +36,14 @@ public class AuthenticationControllerTest {
 
         when(service.register(request)).thenReturn(request);
 
-       
         ResponseEntity<RegisterRequest> responseEntity = controller.register(request);
 
-        
         assertEquals(request, responseEntity.getBody());
     }
 
     @Test
     void testAuthenticate() throws JWTCreationException, IOException {
-        
+
         AuthenticationRequest request = new AuthenticationRequest();
         request.setUsername("testUser");
         request.setPassword("testPassword");
@@ -55,11 +52,8 @@ public class AuthenticationControllerTest {
 
         when(service.authenticate(request)).thenReturn(expectedResponse);
 
-        
         ResponseEntity<AuthenticationResponse> responseEntity = controller.authenticate(request);
 
-        
         assertEquals(expectedResponse, responseEntity.getBody());
     }
 }
-
